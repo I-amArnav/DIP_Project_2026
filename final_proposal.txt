@@ -1,0 +1,20 @@
+1. LINE ART COMPLETION
+
+Aim:
+Explore methods for detecting gaps in line drawings and completing or closing incomplete line art, then compare the results on suitable examples.
+
+Research papers and resources:
+
+https://openaccess.thecvf.com/content_cvpr_2017/papers/Sasaki_Joint_Gap_Detection_CVPR_2017_paper.pdf
+https://openaccess.thecvf.com/content_cvpr_2017/html/Sasaki_Joint_Gap_Detection_CVPR_2017_paper.html
+https://github.com/kaidlc/CVPR2017_linedrawings
+https://github.com/hepesu/LineCloser
+https://doi.org/10.1007/s00371-018-1528-4
+https://arxiv.org/abs/2302.04447
+
+Datasets:
+
+https://qrg.northwestern.edu/Resources/CBO/index.html
+https://paintingvalley.com/dotted-line-drawing
+https://github.com/googlecreativelab/quickdraw-dataset
+https://www.kaggle.com/datasets/wanghaohan/imagenetsketch
