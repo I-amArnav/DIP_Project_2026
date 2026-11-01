@@ -1,0 +1,3 @@
+Extract dataset zip, put desirable input and output dir names in restructure.py
+and generate_inputs.py. Input to restructure.py is extracted dataset, and input
+to generate_inputs.py should be flattened directory obtained from restructure.py.
