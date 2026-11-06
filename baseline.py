@@ -13,11 +13,6 @@ def baseline_line_completion(input_dir, output_dir, max_bridge_dist=25):
     3. Endpoint detection
     4. Automatic stroke thickness estimation
     5. Heuristic gap bridging
-
-    Parameters:
-        input_dir: Directory containing gapped line art PNGs.
-        output_dir: Directory to save completed images.
-        max_bridge_dist: Maximum Euclidean distance for bridging endpoints.
     """
 
     input_path = Path(input_dir)
