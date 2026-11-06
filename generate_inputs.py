@@ -86,13 +86,10 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate synthetic gaps in images")
 
-    parser.add_argument("input_dir", help="Path to clean input directory")
-    parser.add_argument("output_dir", help="Path to gapped output directory")
-    parser.add_argument("--gap-probability", type=float, default=0.0015,
-                        help="Controls the number of gaps per image (default: 0.0015)")
-    parser.add_argument("--eraser-radius-range", type=int, nargs=2, default=(2, 5),
-                        metavar=("MIN", "MAX"),
-                        help="Minimum and maximum gap radius in pixels (default: 2 5)")
+    parser.add_argument("input_dir")
+    parser.add_argument("output_dir")
+    parser.add_argument("--gap-probability", type=float, default=0.002)
+    parser.add_argument("--eraser-radius-range", type=int, nargs=2, default=(4, 7), metavar=("MIN", "MAX"))
 
     args = parser.parse_args()
 
