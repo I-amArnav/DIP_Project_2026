@@ -87,12 +87,6 @@ def baseline_line_completion(input_dir, output_dir, max_bridge_dist=25):
             else:
                 estimated_thickness = 1
 
-            print(
-                f"{file_path.name}: "
-                f"Estimated thickness = "
-                f"{estimated_thickness} pixels"
-            )
-
             # 5. Endpoint Detection using 8-connected neighbors
             neighbor_count = convolve2d(
                 skeleton,
@@ -184,14 +178,22 @@ def baseline_line_completion(input_dir, output_dir, max_bridge_dist=25):
     print(f"Output Directory: {output_path.resolve()}")
 
 
-if __name__ == "__main__":
+import argparse
 
-    # Configure directories
-    GAPPED_INPUT_DIRECTORY = "./Inputs"
-    BASELINE_OUTPUT_DIRECTORY = "./Results"
+# Usage : python script.py ./Inputs ./Results --max-bridge-dist 15
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Baseline line completion")
+
+    parser.add_argument("input_dir")
+    parser.add_argument("output_dir")
+    parser.add_argument("--max-bridge-dist", type=int, default=11,
+                        help="Maximum bridge distance (default: 11)")
+
+    args = parser.parse_args()
 
     baseline_line_completion(
-        input_dir=GAPPED_INPUT_DIRECTORY,
-        output_dir=BASELINE_OUTPUT_DIRECTORY,
-        max_bridge_dist=11
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        max_bridge_dist=args.max_bridge_dist
     )

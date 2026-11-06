@@ -81,15 +81,29 @@ def generate_synthetic_gaps(
   print(f"Output Directory: {output_path.resolve()}")
 
 
-if __name__ == "__main__":
-  # Update paths to match your workflow
-  CLEAN_INPUT_DIRECTORY = "./Outputs"
-  GAPPED_OUTPUT_DIRECTORY = "./Inputs"
+import argparse
 
-  # Tune gap_probability and eraser_radius_range to make gaps harder or easier
-  generate_synthetic_gaps(
-      input_dir=CLEAN_INPUT_DIRECTORY,
-      output_dir=GAPPED_OUTPUT_DIRECTORY,
-      gap_probability=0.0015,  # Controls how many gaps per image
-      eraser_radius_range=(2, 5),  # Controls gap width/size in pixels
-  )
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Generate synthetic gaps in images")
+
+    parser.add_argument("input_dir", help="Path to clean input directory")
+    parser.add_argument("output_dir", help="Path to gapped output directory")
+    parser.add_argument("--gap-probability", type=float, default=0.0015,
+                        help="Controls the number of gaps per image (default: 0.0015)")
+    parser.add_argument("--eraser-radius-range", type=int, nargs=2, default=(2, 5),
+                        metavar=("MIN", "MAX"),
+                        help="Minimum and maximum gap radius in pixels (default: 2 5)")
+
+    args = parser.parse_args()
+
+    generate_synthetic_gaps(
+        input_dir=args.input_dir,
+        output_dir=args.output_dir,
+        gap_probability=args.gap_probability,
+        eraser_radius_range=tuple(args.eraser_radius_range)
+    )
+
+# Usage:
+# python script.py ./Outputs_skeletonized ./Inputs_skeletonized
+# python script.py ./Outputs_skeletonized ./Inputs_skeletonized --gap-probability 0.002
+# python script.py ./Outputs_skeletonized ./Inputs_skeletonized --gap-probability 0.002 --eraser-radius-range 3 7

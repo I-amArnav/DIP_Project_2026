@@ -11,9 +11,9 @@ from keras.preprocessing import image
 
 LOAD_WEIGHTS = False
 ITERATIONS = 50000
-BATCH_SIZE = 4
+BATCH_SIZE = 1
 SEED = 1
-IMG_SHAPE = (352, 352, 1)
+IMG_SHAPE = (256, 256, 1)
 IMG_HEIGHT, IMG_WIDTH, IMG_CHAN = IMG_SHAPE
 
 
