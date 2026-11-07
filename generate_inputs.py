@@ -89,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("input_dir")
     parser.add_argument("output_dir")
     parser.add_argument("--gap-probability", type=float, default=0.002)
-    parser.add_argument("--eraser-radius-range", type=int, nargs=2, default=(4, 7), metavar=("MIN", "MAX"))
+    parser.add_argument("--eraser-radius-range", type=int, nargs=2, default=(4, 9), metavar=("MIN", "MAX"))
 
     args = parser.parse_args()
 
