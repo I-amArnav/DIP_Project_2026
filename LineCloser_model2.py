@@ -8,11 +8,11 @@ from keras.layers import Input, Conv2D, UpSampling2D, BatchNormalization, Activa
 from keras.preprocessing import image
 
 
-LOAD_WEIGHTS = False
-ITERATIONS = 50000
-BATCH_SIZE = 4
+LOAD_WEIGHTS = True
+ITERATIONS = 5000
+BATCH_SIZE = 1
 SEED = 1
-IMG_SHAPE = (352, 352, 1)
+IMG_SHAPE = (256, 256, 1)
 IMG_HEIGHT, IMG_WIDTH, IMG_CHAN = IMG_SHAPE
 
 
@@ -104,7 +104,7 @@ def train():
     model.summary()
 
     if LOAD_WEIGHTS:
-        model.load_weights('./weight/model2.h5')
+        model.load_weights('./weight/model2_200.h5')
 
     model.compile(loss='MSE', optimizer='Adam')
 

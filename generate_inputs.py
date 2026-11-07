@@ -24,7 +24,7 @@ def generate_synthetic_gaps(
 
   print(f"Generating synthetic gaps from: {input_path.resolve()} ...\n")
 
-  for file_path in input_path.glob("*.png"):
+  for file_path in input_path.glob("*.jpg"):
     try:
       # Read image as grayscale
       img = cv2.imread(str(file_path), cv2.IMREAD_GRAYSCALE)
@@ -83,8 +83,8 @@ def generate_synthetic_gaps(
 
 if __name__ == "__main__":
   # Update paths to match your workflow
-  CLEAN_INPUT_DIRECTORY = "./Outputs"
-  GAPPED_OUTPUT_DIRECTORY = "./Inputs"
+  CLEAN_INPUT_DIRECTORY = "./Outputs_For_Prediction"
+  GAPPED_OUTPUT_DIRECTORY = "./Inputs_For_Prediction"
 
   # Tune gap_probability and eraser_radius_range to make gaps harder or easier
   generate_synthetic_gaps(

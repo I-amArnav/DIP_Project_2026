@@ -8,12 +8,12 @@ import cv2
 from keras.models import load_model
 
 R = 2 ** 4
-MODEL_NAME = './model1.h5'
+MODEL_NAME = './weight/model2_1300.h5'
 
 model = load_model(MODEL_NAME)
 model.summary()
 
-for root, dirs, files in os.walk('./Inputs', topdown=False):
+for root, dirs, files in os.walk('./Inputs_For_Prediction', topdown=False):
     for name in files:
         print(os.path.join(root, name))
 
