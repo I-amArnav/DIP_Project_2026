@@ -1,3 +1,4 @@
+import argparse
 import random
 from pathlib import Path
 import cv2
@@ -5,24 +6,25 @@ import numpy as np
 
 
 def generate_synthetic_gaps(
-    input_dir, output_dir, gap_probability=0.002, eraser_radius_range=(3, 7)
+    input_dir,
+    output_dir,
+    gap_probability=0.002,
+    thickness_multiplier=1.3,
+    min_radius=3,
 ):
-  """Applies synthetic contiguous gaps (eraser strokes) to line art images.
+  """Applies synthetic contiguous gaps (eraser strokes) to line art images,
 
-  :param input_dir: Directory containing clean PNG line art.
-  :param output_dir: Directory to save broken/gapped line art.
-  :param gap_probability: Density of gaps (number of eraser strokes relative
-  to image size).
-  :param eraser_radius_range: Min and max radius of the eraser circle in pixels.
+  using an eraser radius dynamically scaled to the local stroke thickness via
+  distance transform.
   """
   input_path = Path(input_dir)
   output_path = Path(output_dir)
   output_path.mkdir(parents=True, exist_ok=True)
 
+  print(f"Generating synthetic gaps from: {input_path.resolve()} ...\n")
+
   processed_count = 0
   error_count = 0
-
-  print(f"Generating synthetic gaps from: {input_path.resolve()} ...\n")
 
   for file_path in input_path.glob("*.png"):
     try:
@@ -32,9 +34,11 @@ def generate_synthetic_gaps(
         continue
 
       # Ensure binary line art: lines are black (low values), background is white (255)
-      # Assuming standard line art (dark lines on white background)
-      # If your lines are white on black, invert this logic.
       _, binary = cv2.threshold(img, 200, 255, cv2.THRESH_BINARY)
+      lines = (binary < 50).astype(np.uint8)
+
+      # Compute distance transform to find local stroke thickness at every pixel
+      distance_map = cv2.distanceTransform(lines, cv2.DIST_L2, 5)
 
       # Find coordinates of all black pixels (stroke pixels)
       y_indices, x_indices = np.where(binary < 50)
@@ -42,24 +46,21 @@ def generate_synthetic_gaps(
         continue
 
       # Determine number of gaps based on stroke pixel count
-      # (e.g., 1 gap per ~500 stroke pixels, adjustable via gap_probability)
       num_gaps = int(len(x_indices) * gap_probability)
-      num_gaps = max(
-          1, num_gaps
-      )  # Ensure at least 1 gap if there are strokes
+      num_gaps = max(1, num_gaps)
 
       # Copy image to apply modifications
       broken_img = binary.copy()
 
       # Randomly select anchor points along the strokes and "erase" them
       for _ in range(num_gaps):
-        # Pick a random index from the black pixels
         idx = random.randint(0, len(x_indices) - 1)
         cx, cy = x_indices[idx], y_indices[idx]
 
-        # Choose a random eraser radius
-        radius = random.randint(
-            eraser_radius_range[0], eraser_radius_range[1]
+        # Dynamically scale eraser radius based on local distance transform thickness
+        local_thickness = distance_map[cy, cx]
+        radius = int(
+            max(min_radius, local_thickness * thickness_multiplier + random.uniform(0, 2))
         )
 
         # Draw a white circle (255) to wipe out the line segment
@@ -81,24 +82,36 @@ def generate_synthetic_gaps(
   print(f"Output Directory: {output_path.resolve()}")
 
 
-import argparse
-
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Generate synthetic gaps in images")
+  parser = argparse.ArgumentParser(
+      description="Generate synthetic gaps with thickness-scaled radius"
+  )
 
-    parser.add_argument("input_dir")
-    parser.add_argument("output_dir")
-    parser.add_argument("--gap-probability", type=float, default=0.002)
-    parser.add_argument("--eraser-radius-range", type=int, nargs=2, default=(4, 9), metavar=("MIN", "MAX"))
+  parser.add_argument("input_dir")
+  parser.add_argument("output_dir")
+  parser.add_argument("--gap-probability", type=float, default=0.0035)
+  parser.add_argument(
+      "--thickness-multiplier",
+      type=float,
+      default=1.5,
+      help="Multiplier for local thickness to ensure clean cuts",
+  )
+  parser.add_argument(
+      "--min-radius",
+      type=int,
+      default=3,
+      help="Minimum eraser radius in pixels",
+  )
 
-    args = parser.parse_args()
+  args = parser.parse_args()
 
-    generate_synthetic_gaps(
-        input_dir=args.input_dir,
-        output_dir=args.output_dir,
-        gap_probability=args.gap_probability,
-        eraser_radius_range=tuple(args.eraser_radius_range)
-    )
+  generate_synthetic_gaps(
+      input_dir=args.input_dir,
+      output_dir=args.output_dir,
+      gap_probability=args.gap_probability,
+      thickness_multiplier=args.thickness_multiplier,
+      min_radius=args.min_radius,
+  )
 
 # Usage:
 # python script.py ./Outputs_skeletonized ./Inputs_skeletonized
