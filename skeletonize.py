@@ -49,17 +49,27 @@ def create_skeletonized_dataset(input_dir, output_dir):
       error_count += 1
 
   print("-" * 40)
-  print(f"✨ Skeletonization Complete!")
-  print(f"📁 Skeletonized images saved: {processed_count}")
-  print(f"⚠️ Errors encountered: {error_count}")
-  print(f"📂 Output Directory: {output_path.resolve()}")
+  print(f"Skeletonization Complete!")
+  print(f"Skeletonized images saved: {processed_count}")
+  print(f"Errors encountered: {error_count}")
+  print(f"Output Directory: {output_path.resolve()}")
 
+
+import argparse
 
 if __name__ == "__main__":
-  # Point to your flattened clean dataset
-  CLEAN_INPUT_DIRECTORY = "./flattened_png_dataset"
-  SKELETON_OUTPUT_DIRECTORY = "./skeletonized_clean_dataset"
+    parser = argparse.ArgumentParser(description="Create skeletonized dataset")
 
-  create_skeletonized_dataset(
-      input_dir=CLEAN_INPUT_DIRECTORY, output_dir=SKELETON_OUTPUT_DIRECTORY
-  )
+    parser.add_argument("input_dir", help="Path to clean input dataset directory")
+    parser.add_argument("output_dir", help="Path to skeletonized output directory")
+
+    args = parser.parse_args()
+
+    create_skeletonized_dataset(
+        input_dir=args.input_dir,
+        output_dir=args.output_dir
+    )
+
+# Usage:
+# python script.py ./Outputs ./Outputs_skeletonized
+# python script.py /path/to/clean_dataset /path/to/skeletonized_dataset

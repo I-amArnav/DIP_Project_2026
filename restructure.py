@@ -66,9 +66,18 @@ def process_dataset(input_dir, output_dir):
   print(f"Output Directory: {output_path.resolve()}")
 
 
-if __name__ == "__main__":
-  # Update these paths to match your WSL/Linux environment paths
-  INPUT_DIRECTORY = "./CBO_Dataset"
-  OUTPUT_DIRECTORY = "./Outputs"
+import argparse
 
-  process_dataset(INPUT_DIRECTORY, OUTPUT_DIRECTORY)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Process dataset")
+
+    parser.add_argument("input_dir", help="Path to input dataset directory")
+    parser.add_argument("output_dir", help="Path to output directory")
+
+    args = parser.parse_args()
+
+    process_dataset(args.input_dir, args.output_dir)
+
+# Usage:
+# python script.py ./CBO_Dataset ./Outputs
+# python script.py /path/to/input_dataset /path/to/output_directory
