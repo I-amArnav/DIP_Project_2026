@@ -63,8 +63,6 @@ def process_dataset(input_dir, output_dir):
   print(f"Total PNGs saved: {converted_count}")
   print(f"Duplicates removed: {duplicate_count}")
   print(f"Errors/Skipped: {error_count}")
-  print(f"Output Directory: {output_path.resolve()}")
-
 
 import argparse
 

@@ -1,0 +1,17 @@
+Redundant options :
+Option 1: Fast Marching Method (FMM) Inpainting
+The Official Source: Alexandru Telea, "An Image Inpainting Technique Based on the Fast Marching Method", Journal of Graphics Tools, 2004.
+
+How it handles full-thickness lines: Natively and perfectly. FMM doesn't care about line thickness or skeletonization at all. It takes your corrupted input image, requires a binary mask of where the gaps are, and marches inward from the boundaries of the gap using the image's local gradient and distance map. It automatically blends the existing line thickness and smooths it across the gap.
+
+Why it's great for your project: It is built directly into OpenCV (cv2.inpaint(img, mask, inpaintRadius, cv2.INPAINT_TELEA)), meaning you can implement a robust, publication-backed traditional DIP algorithm in just a few lines of code without needing endpoint tracking.
+
+Option 2: Cubic Spline Curve Interpolation
+The Official Source: Foundational Computational Geometry and Computer Graphics theory (e.g., Computer Graphics: Principles and Practice by Foley, van Dam, et al., covering parametric cubic curves and Hermite/Bezier interpolation).
+
+How it handles full-thickness lines: Instead of drawing a thin 1-pixel line, once the spline coordinates are calculated across the gap, you render the curve using cv2.polylines() and pass your estimated thickness (derived from the distance transform) directly into the thickness parameter. This makes the curve match the exact width of the surrounding strokes.
+
+Option 3: Navier-Stokes Fluid Dynamics Inpainting
+The Official Source: Marcelo Bertalmío, Andrea Bertozzi, and Guillermo Sapiro, "Navier-Stokes, Fluid Dynamics, and Image and Video Inpainting", IEEE CVPR, 2001.
+
+How it handles full-thickness lines: Like FMM, this treats the image as a fluid medium and propagates intensity and gradient vectors from the boundary into the gap using partial differential equations (PDEs). It is also natively supported in OpenCV (cv2.INPAINT_NS).

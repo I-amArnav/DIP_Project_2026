@@ -6,21 +6,13 @@ from skimage.morphology import skeletonize
 
 
 def baseline_normal_line_completion(input_dir, output_dir, max_bridge_dist=15):
-    """
-    Classical DIP Line Completion for Normal (Full-Thickness) Line Art:
-    1. Binarization
-    2. Internal skeletonization only for reliable endpoint detection
-    3. Distance transform on normal lines for accurate stroke thickness estimation
-    4. Gap bridging with thickness-matched lines and smooth caps on normal image
-    """
     input_path = Path(input_dir)
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
-    print(f"Running Normal-Image Baseline Line Completion on: {input_path.resolve()} ...\n")
+    print(f"Running on: {input_path.resolve()}\n")
 
     processed_count = 0
-    error_count = 0
 
     # 3x3 kernel for counting 8-connected neighbors
     kernel = np.array([
@@ -40,7 +32,7 @@ def baseline_normal_line_completion(input_dir, output_dir, max_bridge_dist=15):
             _, binary = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
             lines = (binary < 127).astype(np.uint8)
 
-            # 3. Skeletonize *internally* just to find clean endpoint coordinates
+            # 3. Skeletonize just to find clean endpoint coordinates
             skeleton = skeletonize(lines > 0).astype(np.uint8)
 
             # 4. Automatic stroke thickness estimation using distance transform on normal lines
@@ -92,22 +84,18 @@ def baseline_normal_line_completion(input_dir, output_dir, max_bridge_dist=15):
 
         except Exception as e:
             print(f"Error processing {file_path.name}: {e}")
-            error_count += 1
 
-    print("-" * 40)
-    print("Normal-Image Baseline Processing Complete!")
+    print("Processing Complete")
     print(f"Completed images saved: {processed_count}")
-    print(f"Errors encountered: {error_count}")
-    print(f"Output Directory: {output_path.resolve()}")
 
 
 import argparse
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Normal Image Baseline line completion")
-    parser.add_argument("input_dir", help="Input directory containing normal gapped images")
-    parser.add_argument("output_dir", help="Output directory for completed images")
-    parser.add_argument("--max-bridge-dist", type=int, default=17, help="Maximum bridge distance")
+    parser = argparse.ArgumentParser(description="Image line completion")
+    parser.add_argument("input_dir")
+    parser.add_argument("output_dir")
+    parser.add_argument("--max-bridge-dist", type=int, default=17)
 
     args = parser.parse_args()
 

@@ -6,7 +6,6 @@ from skimage.morphology import skeletonize
 
 def create_skeletonized_dataset(input_dir, output_dir):
   """Reads clean line art, binarizes, skeletonizes to 1-pixel thickness,
-
   and saves to a new directory for baseline testing.
   """
   input_path = Path(input_dir)
@@ -52,7 +51,6 @@ def create_skeletonized_dataset(input_dir, output_dir):
   print(f"Skeletonization Complete!")
   print(f"Skeletonized images saved: {processed_count}")
   print(f"Errors encountered: {error_count}")
-  print(f"Output Directory: {output_path.resolve()}")
 
 
 import argparse

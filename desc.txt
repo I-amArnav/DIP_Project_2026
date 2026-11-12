@@ -1,0 +1,100 @@
+algo1
+Classical Line Completion for Normal (Full-Thickness) Line Art:
+    1. Binarization
+    2. Internal skeletonization only for reliable endpoint detection
+    3. Distance transform on normal lines for accurate stroke thickness estimation
+    4. Gap bridging with thickness-matched lines and smooth caps on normal image
+
+algo2
+Direction-aware classical line-art completion, v2 (no neural network).
+
+What is new vs v1 (found via the failure overlays: bridges were drawn from
+skeleton endpoints that hook toward one corner of a thick stroke's cut face,
+giving tilted / shifted bridges, and gaps allowed to grow too much with width)
+
+  1. Radius-aware spur pruning: a skeleton branch is removed if it is shorter
+     than ~1.5x the stroke radius at the junction (kills the forks that
+     concave cut ends create on thick strokes).
+  2. Robust tangent: a PCA line fit to skeleton points BEHIND the tip zone
+     (skipping the first ~radius px, where the skeleton hooks).
+  3. Tip refinement: the fitted centre-line is marched outward until it leaves
+     the stroke, giving the true centre of the cut face (not the skeleton end).
+  4. Pair cost now also penalises lateral offset (both strokes must line up
+     within about one stroke width) and stroke-width mismatch.
+  5. Bridges are Bezier curves from just inside one cut face to just inside
+     the other, thickness = mean stroke width, so they merge seamlessly.
+  6. "T" bridges (endpoint -> side of another stroke) march along the tangent
+     through background until they hit foreground, over a shorter range.
+
+Works on full-thickness and 1-px skeletonized inputs.
+
+evaluate.py
+Line-completion evaluation v2 (tolerance-aware, gap-event aware).
+
+Changes vs evaluate_tolerant.py
+  * "Missing" and "added" pixels are now defined PER tolerance tau, so the
+    corrupted input scores exactly 0 gap recall at every tau (no more
+    artefacts at tau > gap_def).
+  * Signed component-count difference (positive = still fragmented,
+    negative = over-merged) next to the absolute error.
+  * Gap-EVENT metrics: each removed stroke piece is one "gap", each newly drawn
+    piece is one "bridge".
+        Gap close rate     = gaps restored (>= close_frac of pixels within tau)
+        Bridgeable close   = same, only for gaps with a stroke on BOTH sides
+                             (the ceiling for any endpoint-based method)
+        Bridge precision   = bridges that lie on the GT (>= close_frac within tau)
+        Event F1           = harmonic mean of close rate and bridge precision
+    Pooled totals are printed too, so you can quote e.g. "812/1040 gaps closed,
+    131/980 bridges wrong".
+print("NOTES")
+    print("* Standard metrics compare exact pixels: a bridge 1-2 px off the true stroke counts as")
+    print("  a false positive AND a false negative, and ~99% of pixels are never touched by any")
+    print("  algorithm, so real gap fixes barely move PSNR/SSIM/MSE/Accuracy.")
+    print("* Tolerant metrics use skeletons and a tau-pixel match distance (thickness-independent).")
+    print("* Gap / added pixels are defined per tau: GT skeleton pixels farther than tau from the input")
+    print("  are 'missing'; output pixels farther than tau from the input are 'added'. The corrupted")
+    print("  input therefore scores 0 gap recall at every tau.")
+    print("* (ref) rows: the input is 1.0 by construction (it never draws or deletes anything extra),")
+    print("  so compare ALGORITHMS on them, not input vs output.")
+    print(f"* A gap is closed / a bridge is correct if >= {close_frac:.0%} of its pixels are within tau of")
+    print("  the other skeleton. Components smaller than "
+          f"{min_event_px} px are ignored. Bridgeable gaps have existing strokes on both sides.")
+    print("* Some damage is unrecoverable (a stroke tip or short stroke fully erased), so 100% gap")
+    print("  close rate is not attainable; use the bridgeable rate as the realistic ceiling.")
+    print("* Component diff: positive = still fragmented, negative = over-merged vs ground truth.")
+    print(f"Per-image log written to: {log_file}")
+
+generate_inputs
+Structure-aware synthetic gap generator for line-art completion.
+
+Differences from the old random-circle eraser:
+  * Gaps are cut ALONG a stroke (a capsule that follows the skeleton path), so
+    each gap fully severs exactly one stroke and does not eat neighbours.
+  * Gap length is controlled (in px and relative to local thickness), so it
+    matches what the completion algorithms are meant to bridge.
+  * Gaps are never placed near junctions/corners or near stroke ends, and each
+    side of a gap keeps a minimum stub length (so a tangent can be estimated and
+    the ground truth is unambiguous).
+  * Gap count scales with skeleton LENGTH, not with stroke pixel count, so
+    thick-line images are not over-damaged.
+  * Gaps never overlap each other and never wipe out a whole short stroke.
+  * Deterministic: per-image seed = hash(filename) + --seed.
+  * Optionally writes a binarized clean GT (--gt-dir) and a gap mask (--mask-dir)
+    so evaluation compares like with like and can be restricted to gap regions.
+
+make_overlay
+Failure overlays + diagnosis for line completion.
+
+For each selected image, saves a side-by-side panel:
+    [ corrupted input | overlay | algorithm result ]
+Overlay colours (all measured on skeletons, tolerance tau):
+    GREEN  correct bridge   (newly drawn, within tau of the ground truth)
+    RED    false bridge     (newly drawn, farther than tau from the ground truth)
+    BLUE   missed gap       (ground-truth stroke removed by the corruption, not restored)
+    dark gray  existing strokes in the input,  light gray  ground-truth strokes
+
+It also prints a diagnosis over ALL images: how many gaps were closed / missed,
+how many of the missed ones were actually bridgeable (strokes on both sides),
+how long correct vs false bridges are, and whether false bridges are
+"misaligned" (close to the GT but off) or "spurious" (nowhere near any GT stroke),
+followed by tuning hints for algo.py.
