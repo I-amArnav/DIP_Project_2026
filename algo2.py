@@ -77,8 +77,8 @@ def describe_endpoint(p, skel, lines, dist, g_width):
     p_xy = np.array([p[1], p[0]], dtype=np.float64)
     direction, tip = None, p_xy
     skip = int(round(width / 2))
-    fit = pts[skip: skip + max(6, int(2 * width))] # Why the 6 ?
-    if len(fit) < 4: # Why this ?
+    fit = pts[skip: skip + max(6, int(2 * width))]
+    if len(fit) < 4:
         fit = pts
     if len(fit) >= 4:
         xy = fit[:, ::-1]
@@ -241,7 +241,7 @@ def complete_image(gray, max_gap=12, gap_scale=2.0, max_cost=1.6, max_angle=70.0
 def run(input_dir, output_dir, **kw):
     in_path, out_path = Path(input_dir), Path(output_dir)
     out_path.mkdir(parents=True, exist_ok=True)
-    ok = err = total = 0
+    ok = 0
     for f in sorted(in_path.glob("*.png")):
         try:
             img = cv2.imread(str(f), cv2.IMREAD_GRAYSCALE)
@@ -250,13 +250,11 @@ def run(input_dir, output_dir, **kw):
             res, nb = complete_image(img, **kw)
             cv2.imwrite(str(out_path / f.name), res)
             ok += 1
-            total += nb
         except Exception as e:
             print(f"Error processing {f.name}: {e}")
-            err += 1
     print("-" * 40)
     print("algo2 done!")
-    print(f"Images saved: {ok} | Errors: {err} | Bridges drawn: {total}")
+    print(f"Images saved: {ok}")
 
 
 if __name__ == "__main__":
