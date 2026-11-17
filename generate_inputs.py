@@ -11,8 +11,7 @@ RING = [(-1, -1), (-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1)]
 
 
 def crossing_number(skel):
-    """0->1 transitions around the 8-ring: >=3 means a real branch point
-    (unlike a raw neighbour count, staircase corners are not flagged)."""
+    """0->1 transitions around the 8-ring: >=3 means a real branch point."""
     h, w = skel.shape
     p = np.pad(skel, 1)
     ring = [p[1 + dy:1 + dy + h, 1 + dx:1 + dx + w] for dy, dx in RING]
@@ -188,7 +187,5 @@ if __name__ == "__main__":
 
 """
 Usage:
-  python generate_inputs_v2.py ./Outputs ./Inputs --gt-dir ./GT --mask-dir ./Masks
-  python generate_inputs_v2.py ./Outputs_skeletonized ./Inputs_skeletonized \
-         --gt-dir ./GT_skel --mask-dir ./Masks_skel
+  python generate_inputs_v2.py ./Outputs ./Inputs
 """

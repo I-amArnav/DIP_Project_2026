@@ -314,7 +314,7 @@ def evaluate_line_completion(gt_dir, results_dir, input_dir, log_file,
                       + ",".join(f"{m_out[k]:.4f}" for k in keys) + "\n")
             ok += 1
 
-    # ---- summary ----------------------------------------------------------
+    # ---- summary ---------------------------------------
     line = "=" * 96
     print(line)
     print(" CUMULATIVE EVALUATION SUMMARY: INPUT vs. ALGORITHM OUTPUT")

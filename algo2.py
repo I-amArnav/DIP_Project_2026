@@ -7,18 +7,18 @@ from scipy.spatial import cKDTree
 from skimage.morphology import skeletonize
 
 NEIGH = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
-_KERNEL = np.ones((3, 3), np.uint8)
-_KERNEL[1, 1] = 0
+KERNEL = np.ones((3, 3), np.uint8)
+KERNEL[1, 1] = 0
 
 
 def find_endpoints(skel):
-    count = cv2.filter2D(skel, -1, _KERNEL, borderType=cv2.BORDER_CONSTANT)
+    count = cv2.filter2D(skel, -1, KERNEL, borderType=cv2.BORDER_CONSTANT)
     ys, xs = np.where((skel == 1) & (count == 1))
     return list(zip(ys.tolist(), xs.tolist()))
 
 
 def walk(skel, start, max_len):
-    """Follow the skeleton from `start`. Returns (path[(y,x)...], hit_junction)."""
+    """Follow the skeleton from start. Returns (path[(y,x)...], hit_junction)."""
     h, w = skel.shape
     path = [start]
     visited = {start}
@@ -201,7 +201,6 @@ def complete_image(gray, max_gap=12, gap_scale=2.0, max_cost=1.6, max_angle=70.0
         draw_curve(out, pts, round(width))
         n_bridges += 1
 
-    # ---- endpoint -> stroke ("T") bridging ------------------------------
     if tee:
         h, w = lines.shape
         for i, e in enumerate(eps):
@@ -212,9 +211,9 @@ def complete_image(gray, max_gap=12, gap_scale=2.0, max_cost=1.6, max_angle=70.0
             px, py = e["pos"]
             for ang in (0, 8, -8, 16, -16):
                 rad = np.deg2rad(ang)
-                c_, s_ = np.cos(rad), np.sin(rad)
-                dx = e["dir"][0] * c_ - e["dir"][1] * s_
-                dy = e["dir"][0] * s_ + e["dir"][1] * c_
+                c, s = np.cos(rad), np.sin(rad)
+                dx = e["dir"][0] * c - e["dir"][1] * s
+                dy = e["dir"][0] * s + e["dir"][1] * c
                 left_own = False
                 for t in range(1, tmax + 1):
                     x, y = int(round(px + t * dx)), int(round(py + t * dy))

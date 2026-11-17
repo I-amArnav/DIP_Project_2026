@@ -21,7 +21,7 @@ def baseline_normal_line_completion(input_dir, output_dir, max_bridge_dist=15):
         [1, 1, 1]
     ], dtype=np.uint8)
 
-    for file_path in input_path.glob("*.png"):
+    for file_path in input_path.glob("*.png"): #iterate through directory
         try:
             # 1. Read input image as grayscale
             img = cv2.imread(str(file_path), cv2.IMREAD_GRAYSCALE)
@@ -29,19 +29,19 @@ def baseline_normal_line_completion(input_dir, output_dir, max_bridge_dist=15):
                 continue
 
             # 2. Binary thresholding (Lines = black [0], background = white [255])
-            _, binary = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-            lines = (binary < 127).astype(np.uint8)
+            _, binary = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY) # _ is threshold value
+            lines = (binary < 127).astype(np.uint8) # now 1 = black
 
             # 3. Skeletonize just to find clean endpoint coordinates
             skeleton = skeletonize(lines > 0).astype(np.uint8)
 
-            # 4. Automatic stroke thickness estimation using distance transform on normal lines
+            # 4. Automatic stroke thickness estimation using distance transform on lines
             distance_map = cv2.distanceTransform(lines, cv2.DIST_L2, 5)
             skeleton_distances = distance_map[skeleton > 0]
             
             if len(skeleton_distances) > 0:
                 median_radius = np.median(skeleton_distances)
-                estimated_thickness = max(1, int(round(2 * median_radius)))
+                estimated_thickness = max(1, int(round(2 * median_radius - 1)))
             else:
                 estimated_thickness = 1  # Default thickness for normal lines
 
@@ -60,7 +60,7 @@ def baseline_normal_line_completion(input_dir, output_dir, max_bridge_dist=15):
                 for j, pt2 in enumerate(endpoints):
                     if i >= j:
                         continue
-                    if (i, j) in connected_pairs or (j, i) in connected_pairs:
+                    if (i, j) in connected_pairs:
                         continue
 
                     # Calculate Euclidean distance
