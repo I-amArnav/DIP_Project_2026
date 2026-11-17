@@ -1,4 +1,11 @@
-# Line Art Completion Project - Execution Guide
+# Line Art Completion Project
+
+The Dataset used was CBO_Dataset and its skeletonized version.
+Link of Dataset : https://qrg.northwestern.edu/Resources/CBO/CBO_Dataset_20181113.zip
+
+Link for Notebooks for linecloser : 
+* https://www.kaggle.com/code/swaratakale/01-data-preparation-and-experiments
+* https://www.kaggle.com/code/swaratakale/02-model-training-and-evaluation
 
 ## Prerequisites
 * Python 3.8+
