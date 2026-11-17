@@ -63,10 +63,8 @@ def render(gt_img, in_img, res_img, a, name, scale):
         out.append(np.full((out[-1].shape[0], 4, 3), 160, np.uint8))
     panel = np.hstack(out[:-1])
 
-    n_false = sum(not b["ok"] for b in a["bridges"])
     foot = np.full((22, panel.shape[1], 3), 255, np.uint8)
-    text = (f"{name} | correct {int(a['correct_px'].sum())}px, false {int(a['false_px'].sum())}px, "
-            f"missed {int(a['missed_px'].sum())}px | false bridges {n_false}")
+    text = (f"{name}")
     cv2.putText(foot, text, (4, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 0, 0), 1, cv2.LINE_AA)
     return np.vstack([panel, foot])
 
@@ -132,9 +130,9 @@ def main():
     missed_bridgeable = [g for g in missed if g["two_sided"]]
     missed_onesided = [g for g in missed if not g["two_sided"]]
 
-    print("=" * 78)
+    print("=" * 50)
     print(f"DIAGNOSIS over {len(items)} images (tau = {args.tau}px)")
-    print("=" * 78)
+    print("=" * 50)
     print(f"Gaps: {len(gaps)} total | closed {len(closed)} | missed {len(missed)}")
     print(f"  missed & one-sided (tip/short stroke erased; unrecoverable): {len(missed_onesided)}")
     print(f"  missed & bridgeable (strokes on both sides; algorithm failures): {len(missed_bridgeable)}")
@@ -147,7 +145,7 @@ def main():
     print(f"  median bridge length (px): correct {med([b['len'] for b in ok_b]):.1f} | "
           f"false {med([b['len'] for b in bad_b]):.1f}")
 
-    print("-" * 78)
+    print("-" * 50)
     print("Observations")
     hints = []
     if bad_b and ok_b and med([b["len"] for b in bad_b]) > 1.3 * med([b["len"] for b in ok_b]):
@@ -198,5 +196,5 @@ if __name__ == "__main__":
 
 """
 Usage:
-    python make_overlay.py ./Outputs ./Results ./Inputs ./Overlays
+    python3 make_overlay.py ./Outputs ./Results ./Inputs ./Overlays
 """
